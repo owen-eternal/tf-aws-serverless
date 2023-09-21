@@ -16,3 +16,18 @@ data "aws_iam_policy_document" "lambda-trust-policy-doc" {
     actions = ["sts:AssumeRole"]
   }
 }
+
+# Allow Lambda to send logs to cloudwatch.
+data "aws_iam_policy_document" "lambda-log-policy-doc" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    
+    resources = ["arn:aws:logs:::*"]
+  }
+}
