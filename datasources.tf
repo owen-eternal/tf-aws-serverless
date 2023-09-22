@@ -35,6 +35,6 @@ data "aws_iam_policy_document" "lambda-log-policy-doc" {
 # Archive source code.
 data "archive_file" "tekken_zip_archive" {
   type        = "zip"
-  source_file = "${path.module}/app/"
-  output_path = "${path.module}/tekken-handler.zip"
+  source_dir  = "${path.module}/app/"
+  output_path = "${path.module}/app/tekken-handler.zip"
 }
