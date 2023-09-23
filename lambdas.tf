@@ -22,3 +22,12 @@ resource "aws_lambda_function" "tekken-lambda-function" {
   runtime          = "python3.11"
   depends_on       = [aws_iam_role.lambda-role]
 }
+
+# Create resource based policy statement for invoking a http method.
+resource "aws_lambda_permission" "invokefunction" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.tekken-lambda-function.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${local.api_id}/*/*"
+}
