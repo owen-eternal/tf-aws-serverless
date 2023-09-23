@@ -1,32 +1,56 @@
 import json
 
-def lambda_handler(event: object, context: object = None):
+def lambda_handler(event, context = None):
 
-    character_name: str = event["payload"]["name"]
-    http_method: str = event["method"]
-    path: str = event["path"]
+    method = event["httpMethod"]
+    path = event["path"]
     
     db = {
-        "Noctis": {
-            "powerlevel": 6,
-            "special": "SuperHopkick"
+        "#Noctis": {
+            "name": "Noctis",
+            "powerLevel": 6,
+            "ability": {
+                "evasiveness": 6,
+                "wallCarry": 8,
+                "mobility": 8,
+                "ComboDamage": 5,
+                "ThrowGame": 8
+            },
         },
-        "Anna": {
+        "#Akuma": {
+            "name": "Akuma",
             "powerlevel": 8,
-            "special": "superstrike"
+            "ability": {
+                "evasiveness": 7,
+                "wallCarry": 9,
+                "mobility": 4,
+                "ComboDamage": 10,
+                "ThrowGame": 5
+            }
         }
     }
 
-    if http_method == "GET" and path == "/api/v1/character":
+    
+    if method == "GET" and path == "/character":
 
-        character_data = db.get(character_name)
+        name = event["queryStringParameters"]["name"]
+        character_data = db[name]
 
         return {
             "statusCode": 200,
-            "body": json.dumps(character_data)
+            "body": json.dumps(character_data, indent=2)
         }
-
+        
+    if method == "GET" and path == "/characters":
+        return {
+          "statusCode": 200,
+          "body": json.dumps(db, indent=2)
+        } 
+        
+    
     return {
         "statusCode": 404,
-        "body": "Cannot retrieve data."
+        "body": json.dumps({
+            "message": "resource cannot be found."
+        })
     }
