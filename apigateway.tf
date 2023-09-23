@@ -14,3 +14,10 @@ resource "aws_api_gateway_resource" "character-resource" {
   parent_id   = aws_api_gateway_rest_api.tekken-rest-api.root_resource_id
   path_part   = "character"
 }
+
+resource "aws_api_gateway_method" "character-http-method" {
+  authorization = "NONE"
+  http_method   = "GET"
+  resource_id   = aws_api_gateway_resource.character-resource.id
+  rest_api_id   = aws_api_gateway_rest_api.tekken-rest-api.id
+}
