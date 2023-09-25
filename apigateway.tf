@@ -53,3 +53,23 @@ resource "aws_api_gateway_integration" "characters-integration" {
   uri                     = aws_lambda_function.tekken-lambda-function.invoke_arn
   type                    = "AWS_PROXY"
 }
+
+# Create API Gateway deployment.
+resource "aws_api_gateway_deployment" "deploy_apigw" {
+  rest_api_id = aws_api_gateway_rest_api.tekken-rest-api.id
+
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.character-resource.id,
+      aws_api_gateway_resource.characters-resource.id,
+      aws_api_gateway_method.character-http-method.id,
+      aws_api_gateway_method.characters-http-method.id,
+      aws_api_gateway_integration.character-integration.id,
+      aws_api_gateway_integration.characters-integration.id,
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
