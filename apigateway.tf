@@ -73,3 +73,10 @@ resource "aws_api_gateway_deployment" "deploy_apigw" {
     create_before_destroy = true
   }
 }
+
+# Create API Gateway deployment stage.
+resource "aws_api_gateway_stage" "staging" {
+  deployment_id = aws_api_gateway_deployment.deploy_apigw.id
+  rest_api_id   = aws_api_gateway_rest_api.tekken-rest-api.id
+  stage_name    = var.deployment_stage
+}
