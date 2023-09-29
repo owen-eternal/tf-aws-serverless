@@ -10,3 +10,11 @@ class Character:
             return err.response
         else:
             return response
+
+    def retrieve_items(self, Key_condition_expression):
+        try:
+            response = self.table.query(KeyConditionExpression=Key_condition_expression)
+        except Exception as err:
+            return err.response
+        else:
+            return response
