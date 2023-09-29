@@ -1,56 +1,70 @@
 import json
+import boto3
+from boto3.dynamodb.conditions import Key
+from model import Character, DecimalEncoder
+
 
 def lambda_handler(event, context = None):
 
-    method = event["httpMethod"]
-    path = event["path"]
-    
-    db = {
-        "#Noctis": {
-            "name": "Noctis",
-            "powerLevel": 6,
-            "ability": {
-                "evasiveness": 6,
-                "wallCarry": 8,
-                "mobility": 8,
-                "ComboDamage": 5,
-                "ThrowGame": 8
-            },
-        },
-        "#Akuma": {
-            "name": "Akuma",
-            "powerlevel": 8,
-            "ability": {
-                "evasiveness": 7,
-                "wallCarry": 9,
-                "mobility": 4,
-                "ComboDamage": 10,
-                "ThrowGame": 5
-            }
-        }
-    }
+    method = event['httpMethod']
+    path = event['path']
+    primary_key = event['queryStringParameters']
 
-    
+    dynamodb = boto3.resource("dynamodb", region_name="eu-west-1")
+
     if method == "GET" and path == "/character":
 
-        name = event["queryStringParameters"]["name"]
-        character_data = db[name]
+        character = Character(table_name='Character', resource=dynamodb)
+        data = character.retrieve_item(composite_key=primary_key)
 
-        return {
-            "statusCode": 200,
-            "body": json.dumps(character_data, indent=2)
-        }
-        
+        status_code = data['ResponseMetadata']['HTTPStatusCode']
+        http_headers = data['ResponseMetadata']['HTTPHeaders']
+
+        if 'Error' in data:
+            message = data['Error']['Message']
+            return {
+                'statusCode': status_code,
+                'headers': http_headers,
+                'message': message
+            }
+        else:
+            body = data['Item']
+            return json.dumps({
+                'statusCode': status_code,
+                'headers': http_headers,
+                'body': body,
+            }, 
+            indent=2, 
+            cls=DecimalEncoder
+        )
+
     if method == "GET" and path == "/characters":
-        return {
-          "statusCode": 200,
-          "body": json.dumps(db, indent=2)
-        } 
-        
-    
-    return {
-        "statusCode": 404,
-        "body": json.dumps({
-            "message": "resource cannot be found."
-        })
-    }
+
+        method = event['httpMethod']
+        path = event['path']
+        attribute = event['queryStringParameters']['attribute']
+        hash_key = event['queryStringParameters']['hash_key']
+
+        character = Character(table_name='Character', resource=dynamodb)
+        data = character.retrieve_items(Key_condition_expression=Key(attribute).eq(hash_key))
+
+        status_code = data['ResponseMetadata']['HTTPStatusCode']
+        http_headers = data['ResponseMetadata']['HTTPHeaders']
+
+        if 'Error' in data:
+            message = data['Error']['Message']
+            return {
+                'statusCode': status_code,
+                'headers': http_headers,
+                'message': message
+            }
+        else:
+            body = data['Items']
+            return json.dumps({
+                'statusCode': status_code,
+                'headers': http_headers,
+                'body': body,
+            }, 
+            indent=2, 
+            cls=DecimalEncoder
+        )
