@@ -29,14 +29,11 @@ def lambda_handler(event, context = None):
             }
         else:
             body = data['Item']
-            return json.dumps({
+            return {
                 'statusCode': status_code,
                 'headers': http_headers,
-                'body': body,
-            }, 
-            indent=2, 
-            cls=DecimalEncoder
-        )
+                'body': json.dumps(body, indent=2, cls=DecimalEncoder),
+            }
 
     if method == "GET" and path == "/characters":
 
@@ -56,15 +53,12 @@ def lambda_handler(event, context = None):
             return {
                 'statusCode': status_code,
                 'headers': http_headers,
-                'message': message
+                'body': message
             }
         else:
             body = data['Items']
-            return json.dumps({
+            return {
                 'statusCode': status_code,
                 'headers': http_headers,
-                'body': body,
-            }, 
-            indent=2, 
-            cls=DecimalEncoder
-        )
+                'body': json.dumps(body, indent=2, cls=DecimalEncoder),
+            }
