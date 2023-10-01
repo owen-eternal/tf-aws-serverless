@@ -30,6 +30,16 @@ data "aws_iam_policy_document" "lambda-log-policy-doc" {
 
     resources = ["arn:aws:logs:::*"]
   }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:Query",
+    ]
+
+    resources = ["*"]
+  }
 }
 
 # Archive source code.
